@@ -2,6 +2,7 @@
 name: Update Metadata
 
 on:
+  push:
   schedule:
     - cron: '*/30 * * * *'
 
@@ -30,7 +31,8 @@ jobs:
       - name: "Run Script"
         run: python3 get_metadata.py
 
-      # - name: "Stage, commit and push"
-      #   run: |
-      #     git stage search_cache/
-      #     git commit -m "Update metadata from PyPI ($(date +"%Y-%m-%dT%H:%M:%S%z"))"
+      - name: "Stage, commit and push"
+        run: |
+          git stage search_cache/
+          git status
+          git commit -m "Update metadata from PyPI ($(date +"%Y-%m-%dT%H:%M:%S%z"))"
