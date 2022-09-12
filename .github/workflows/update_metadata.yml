@@ -3,7 +3,7 @@ name: Update Metadata
 
 on:
   schedule:
-    - cron: */30 * * * *
+    - cron: '*/30 * * * *'
 
 jobs:
   Run:
