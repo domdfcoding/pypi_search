@@ -33,6 +33,8 @@ jobs:
 
       - name: "Stage, commit and push"
         run: |
+          git config --global user.email "74742576+repo-helper[bot]@users.noreply.github.com"
+          git config --global user.name "repo-helper[bot]"
           git stage search_cache/
           git status
           git commit -m "Update metadata from PyPI ($(date +"%Y-%m-%dT%H:%M:%S%z"))"
