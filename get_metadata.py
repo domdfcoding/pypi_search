@@ -1,11 +1,13 @@
+# stdlib
 import atexit
-import pypi_json
 import string
-from domdf_python_tools.paths import PathPlus
-import tqdm
-import requests
-from packaging.requirements import InvalidRequirement
 
+# 3rd party
+import pypi_json
+import requests
+import tqdm
+from domdf_python_tools.paths import PathPlus
+from packaging.requirements import InvalidRequirement
 
 hit_count = 0
 miss_count = 0
@@ -19,6 +21,7 @@ verbose = False
 
 per_char_data = {}
 
+
 def data_to_json(filename: PathPlus):
 	data = {}
 	last_key = None
@@ -27,8 +30,8 @@ def data_to_json(filename: PathPlus):
 			if line:
 				try:
 					name, summary_and_serial = line.split(" - ", 1)
-					summary, serial = summary_and_serial.split("\0", 1)
-					data[name] = {"summary": summary, "last_serial": serial.strip("\n")}
+					summary, serial = summary_and_serial.split('\x00', 1)
+					data[name] = {"summary": summary, "last_serial": serial.strip('\n')}
 					last_key = name
 				except ValueError:
 					if last_key is not None:
@@ -37,14 +40,15 @@ def data_to_json(filename: PathPlus):
 
 	return data
 
-for char in ("$" + string.ascii_lowercase):
+
+characters = '$' + string.ascii_lowercase
+
+for char in characters:
 	char_filename = cache_dir / char
 	if char_filename.is_file():
 		per_char_data[char] = data_to_json(char_filename)
 	else:
 		per_char_data[char] = {}
-
-
 
 # Projects which are in the simple API only
 # Ref: https://github.com/pypi/warehouse/issues/12207
@@ -54,31 +58,31 @@ if (cache_dir / "bad_names.json").is_file():
 	bad_names = (cache_dir / "bad_names.json").load_json()
 
 
-
 def truncate(name: str) -> str:
-        """
+	"""
         Truncate summary to 100 chars max
         """
 
-        filename_len = len(name)
-        if filename_len > 100:
-                return name[:97] + "..."
-        else:
-                return name
+	filename_len = len(name)
+	if filename_len > 100:
+		return name[:97] + "..."
+	else:
+		return name
+
 
 def write_cache_on_exit():
 
 	for char in per_char_data:
 		(cache_dir / char).write_text('')
 		for project_name, project_data in per_char_data[char].items():
-			(cache_dir / char).append_text(f"{project_name} - {truncate(project_data['summary'])}\0{project_data['last_serial']}\n")
+			(cache_dir / char).append_text(
+					f"{project_name} - {truncate(project_data['summary'])}\0{project_data['last_serial']}\n"
+					)
 
 	(cache_dir / "bad_names.json").dump_json(bad_names)
 
 
 atexit.register(write_cache_on_exit)
-
-
 
 response = requests.get("https://pypi.org/simple/", headers={"Accept": "application/vnd.pypi.simple.latest+json"})
 response.raise_for_status()
@@ -93,16 +97,17 @@ with pypi_json.PyPIJSON() as json_client:
 
 		first_letter = name[0].lower()
 		if first_letter not in string.ascii_letters:
-			first_letter = "$"
+			first_letter = '$'
 
 		if name in bad_names:
 			continue
 
-		if name in per_char_data[first_letter] and per_char_data[first_letter][name]["last_serial"] == str(current_last_serial):
+		if name in per_char_data[first_letter] and per_char_data[first_letter][name][
+				"last_serial"] == str(current_last_serial):
 			continue
-			
+
 		changed_count += 1
-		
+
 		if verbose:
 			print(f"Updating {name}")
 
@@ -118,10 +123,9 @@ with pypi_json.PyPIJSON() as json_client:
 			print(e)
 			continue
 
-		summary = (metadata.info["summary"] or '').replace("\n", " ")
+		summary = (metadata.info["summary"] or '').replace('\n', ' ').replace('\r', ' ')
 
 		per_char_data[first_letter][name] = {"summary": summary, "last_serial": current_last_serial}
 		# input(">")
-
 
 print(f"Updated metadata for {changed_count} projects")
