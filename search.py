@@ -64,11 +64,10 @@ def main(regex: Tuple[str], names_only: bool = False):
 				"clone",
 				"https://github.com/domdfcoding/pypi_search",
 				git_cache_dir.as_posix(),
-				"--depth=1"
 				])
 	else:
 		with in_directory(git_cache_dir):
-			subprocess.check_call(["git", "pull", "--depth=1"])
+			subprocess.check_call(["git", "pull"])
 
 	search_term = regex[0]
 	extra_search_terms = list(regex[1:])
