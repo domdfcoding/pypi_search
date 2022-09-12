@@ -1,0 +1,36 @@
+---
+name: Update Metadata
+
+on:
+  schedule:
+    - cron: */30 * * * *
+
+jobs:
+  Run:
+    name: "Update Metadata"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Checkout 🛎️
+        uses: "actions/checkout@v3"
+        # ref: ''
+
+      - name: Setup Python 🐍
+        uses: "actions/setup-python@v4"
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies 🔧
+        run: |
+          python -VV
+          python -m site
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install -r requirements.txt
+
+      - name: "Run Script"
+        run: python3 -m get_metadata.py
+
+      # - name: "Stage, commit and push"
+      #   run: |
+      #     git stage search_cache/
+      #     git commit -m "Update metadata from PyPI ($(date +"%Y-%m-%dT%H:%M:%S%z"))"

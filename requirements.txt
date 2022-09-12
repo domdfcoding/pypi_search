@@ -1,0 +1,6 @@
+pypi_json
+domdf_python_tools
+tqdm
+requests
+packaging
+
