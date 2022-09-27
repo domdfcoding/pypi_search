@@ -50,7 +50,7 @@ for char in characters:
 	else:
 		per_char_data[char] = {}
 
-# Projects which are in the simple API only
+# Projects which have no releases, so only appear in the simple API
 # Ref: https://github.com/pypi/warehouse/issues/12207
 bad_names = []
 
