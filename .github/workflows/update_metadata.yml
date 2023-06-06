@@ -32,6 +32,7 @@ jobs:
         run: python3 get_metadata.py
 
       - name: "Stage, commit and push"
+        continue-on-error: true
         run: |
           git config --global user.email "74742576+repo-helper[bot]@users.noreply.github.com"
           git config --global user.name "repo-helper[bot]"
