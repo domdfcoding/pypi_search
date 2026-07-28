@@ -3,9 +3,9 @@ import atexit
 import string
 
 # 3rd party
+import araokaat
 import pypi_json
 import requests
-import tqdm
 from domdf_python_tools.paths import PathPlus
 from packaging.requirements import InvalidRequirement
 
@@ -90,7 +90,7 @@ simple_data = response.json()
 
 with pypi_json.PyPIJSON() as json_client:
 
-	for project in tqdm.tqdm(simple_data["projects"]):
+	for project in araokaat.araokaat(simple_data["projects"]):
 		# print(project)
 		name = project["name"]
 		current_last_serial = project["_last-serial"]
